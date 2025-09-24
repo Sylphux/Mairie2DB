@@ -2,12 +2,27 @@ class Scrap
 
     attr_accessor :instances, :noms_mairies, :liens_mairies, :emails_mairies, :mairies_scrapped, :to_search
     @@instances = []
+    
+    def save_as_csv
+        File.open('db/emails.csv', 'w') do |f|
+            i = 0
+            l = 1
+            while @emails_mairies[i] != nil
+                    if @emails_mairies[i] != "None"
+                        f.write("#{l},\"#{@noms_mairies[i].to_s}\",\"#{@emails_mairies[i].to_s}\"\n")
+                        l += 1
+                    end
+                    i += 1
+            end
+        end
+        puts "\nDonnées enregistrées dans db/emails.csv"
+    end
 
     def save_as_JSON
         File.open('db/emails.json', 'w') do |f|
             f.write(@mairies_scrapped.to_json)
         end
-        puts "Données enregistrées dans db/emails.json"
+        puts "\nDonnées enregistrées dans db/emails.json"
     end
 
     def test_json_gdrive
@@ -21,10 +36,11 @@ class Scrap
                 end
                 puts "Fichier config.json créé."
             else
-                puts "Vous devez créer un fichier .env à la racine avec à l'intérieur :"
+                puts "\nVous devez créer un fichier .env à la racine avec à l'intérieur :"
                 puts "ID='votre id d'API google'"
                 puts "SECRET='votre code secret d'API google'"
                 puts "Pour plus d'informations sur la création de ces identifiants, suivez cette consigne : https://github.com/gimite/google-drive-ruby/blob/master/doc/authorization.md"
+                puts "\nAbandon."
                 return false
             end
         else
@@ -56,7 +72,7 @@ class Scrap
             i += 1
         end
         ws.save
-        puts "\nSaved at https://docs.google.com/spreadsheets/d/#{ask}"
+        puts "\nEnregistré à https://docs.google.com/spreadsheets/d/#{ask}"
     end
 
     def save_as_txt
@@ -69,7 +85,7 @@ class Scrap
                 i += 1
             end 
         end
-        puts "Données enregistrées dans db/emails.txt"
+        puts "\nDonnées enregistrées dans db/emails.txt"
     end
 
     def self.all
@@ -178,7 +194,7 @@ class Scrap
     end
 
     def save_prompt
-        puts "\nSave as ? (txt/json/gdrive/skip)"
+        puts "\nSave as ? (txt/json/gdrive/csv/skip)"
         ask = gets.chomp.to_s
         if ask == "txt"
             save_as_txt
@@ -186,6 +202,8 @@ class Scrap
             save_as_JSON
         elsif ask == "gdrive"
             save_as_gdrive
+        elsif ask == "csv"
+            save_as_csv
         elsif ask == "" or ask == "skip"
             return
         end
