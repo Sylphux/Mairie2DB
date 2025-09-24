@@ -4,6 +4,8 @@ require 'etc'
 require 'json'
 require_relative 'lib/app/scrapper'
 require 'google_drive'
+require 'dotenv/load'
+
 
 def verify
     puts "\nBienvenue dans le scrappeur de l'annuaire public."

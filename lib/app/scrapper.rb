@@ -10,11 +10,37 @@ class Scrap
         puts "Données enregistrées dans db/emails.json"
     end
 
+    def test_json_gdrive
+        if File.exist?("lib/gdrive/config.json") == false #check if config.json exist, if not, create it
+            if File.exist?(".env")
+                File.open("lib/gdrive/config.json", 'w') do |f|
+                    f.write("{\n")
+                    f.write("  \"client_id\": \"#{ENV['ID']}\",\n")
+                    f.write("  \"client_secret\": \"#{ENV['SECRET']}\"\n")
+                    f.write("}")
+                end
+                puts "Fichier config.json créé."
+            else
+                puts "Vous devez créer un fichier .env à la racine avec à l'intérieur :"
+                puts "ID='votre id d'API google'"
+                puts "SECRET='votre code secret d'API google'"
+                puts "Pour plus d'informations sur la création de ces identifiants, suivez cette consigne : https://github.com/gimite/google-drive-ruby/blob/master/doc/authorization.md"
+                return false
+            end
+        else
+            puts "Fichier config.json trouvé."
+        end
+        return true
+    end
+
     def save_as_gdrive
-        puts "what is the google drive document key ?"
+        if test_json_gdrive == false
+            return
+        end
+        puts "Quelle est la clé du document google drive ? (trouvable dans l'url)"
+        print "Clé : "
         ask = gets.chomp.to_s
-        ask = "1CfHqbKyFR85z2N1Ew8CEp_fKBVb-zRJq9KkjynTmDgc"
-        session = GoogleDrive::Session.from_config("config.json")
+        session = GoogleDrive::Session.from_config("lib/gdrive/config.json")
         ws = session.spreadsheet_by_key(ask).worksheets[0]
         i = 0
         y = 1
@@ -34,12 +60,14 @@ class Scrap
     end
 
     def save_as_txt
-        i = 0
-        while @emails_mairies[i] != nil
-            if @emails_mairies[i] != "None"
-                system "echo '#{@noms_mairies[i].to_s} | #{@emails_mairies[i].to_s}' >> db/emails.txt"
-            end
-            i += 1
+        File.open("db/emails.txt", 'w') do |f|
+            i = 0
+            while @emails_mairies[i] != nil
+                if @emails_mairies[i] != "None"
+                    f.write("#{@noms_mairies[i].to_s} | #{@emails_mairies[i].to_s}\n")
+                end
+                i += 1
+            end 
         end
         puts "Données enregistrées dans db/emails.txt"
     end
