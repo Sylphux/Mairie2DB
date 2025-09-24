@@ -10,8 +10,27 @@ class Scrap
         puts "Données enregistrées dans db/emails.json"
     end
 
-    def save_as_csv
-        
+    def save_as_gdrive
+        puts "what is the google drive document key ?"
+        ask = gets.chomp.to_s
+        ask = "1CfHqbKyFR85z2N1Ew8CEp_fKBVb-zRJq9KkjynTmDgc"
+        session = GoogleDrive::Session.from_config("config.json")
+        ws = session.spreadsheet_by_key(ask).worksheets[0]
+        i = 0
+        y = 1
+        while ws[y, 1].to_s != ""
+            y += 1
+        end
+        while @emails_mairies[i] != nil
+            if @emails_mairies[i] != "None"
+                ws[y, 1] = @noms_mairies[i]
+                ws[y, 2] = @emails_mairies[i]
+                y += 1
+            end
+            i += 1
+        end
+        ws.save
+        puts "\nSaved at https://docs.google.com/spreadsheets/d/#{ask}"
     end
 
     def save_as_txt
@@ -131,12 +150,14 @@ class Scrap
     end
 
     def save_prompt
-        puts "\nSave as ? (txt/json/csv/skip)"
+        puts "\nSave as ? (txt/json/gdrive/skip)"
         ask = gets.chomp.to_s
         if ask == "txt"
             save_as_txt
         elsif ask == "json"
             save_as_JSON
+        elsif ask == "gdrive"
+            save_as_gdrive
         elsif ask == "" or ask == "skip"
             return
         end

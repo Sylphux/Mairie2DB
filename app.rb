@@ -3,6 +3,7 @@ require 'open-uri'
 require 'etc'
 require 'json'
 require_relative 'lib/app/scrapper'
+require 'google_drive'
 
 def verify
     puts "\nBienvenue dans le scrappeur de l'annuaire public."
