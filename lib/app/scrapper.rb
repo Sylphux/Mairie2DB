@@ -56,37 +56,52 @@ class Scrap
         end
     end
 
+    def show_help
+        puts "\nPrefixes disponibles"
+        puts "   'mairies'\n   'ft' (france travail)\n   'prefec' (prefecture)\n   'missl' (mission locale)"
+        puts "\nUtilisez x/exit/quit pour quitter le programme"
+    end
+
     def test_input
-        if @to_search == "exit" || @to_search == ""
-            puts "Leaving the program"
+        if @to_search == "h" or @to_search == "help"
+            show_help
+            prompt
+        end
+        if @to_search == "exit" || @to_search == "" || @to_search == "quit" || @to_search == "x"
+            puts "Leaving the program\n\n"
             exit
         end
-        until @to_search.include?("https://lannuaire.service-public.fr/recherche?") || @to_search.include?("mairies")
-            puts "Désolé, l'adresse recherché n'est pas valide."
-            puts "L'adresse doit commencer par https://lannuaire.service-public.fr"
-            puts "Entrez une nouvelle adresse fonctionelle :"
+        until @to_search.include?("https://lannuaire.service-public.fr/recherche?") || @to_search.include?("mairies") || @to_search.include?("ft") || @to_search.include?("prefec")|| @to_search.include?("missl")
+            puts "\nDésolé, l'adresse recherchée n'est pas valide."
+            puts "L'adresse doit commencer par https://lannuaire.service-public.fr ou un prefixe valide."
+            puts "Pour voir les prefixes disponibles, utilisez 'h' ou 'help'"
             prompt
         end
     end
 
     def reassign_input 
-        if @to_search == "mairies"
-            @to_search = 'https://lannuaire.service-public.fr/recherche?whoWhat=Mairie&where='
-        elsif
-            @to_search.include? "mairies "
-            @to_search = "https://lannuaire.service-public.fr/recherche?whoWhat=Mairie&where=#{@to_search.gsub("mairies ", '')}"
+        if @to_search.include? "mairies"
+            @to_search = "https://lannuaire.service-public.fr/recherche?whoWhat=Mairie&where=#{@to_search.gsub("mairies", '')}"
+        end
+        if @to_search.include? "ft" #france travail
+            @to_search = "https://lannuaire.service-public.fr/recherche?whoWhat=France+Travail&where=#{@to_search.gsub("ft", '')}"
+        end
+        if @to_search.include? "prefec" #prefecture
+            @to_search = "https://lannuaire.service-public.fr/recherche?whoWhat=Pr%C3%A9fecture&where=#{@to_search.gsub("prefec", '')}"
+        end
+        if @to_search.include? "missl" #mission locale
+            @to_search = "https://lannuaire.service-public.fr/recherche?whoWhat=Mission+locale+pour+l%27insertion+professionnelle+et+sociale+des+jeunes+%2816-25+ans%29&where=#{@to_search.gsub("missl", '')}"
         end
     end
 
     def prompt
-        print "\nprompt/exit"
-        print "\nScrap : "
+        print "\n#{Etc.getlogin} : "
         @to_search = gets.chomp.to_s
+        test_input
     end
 
     def go_scrap
         prompt
-        test_input #tests input corresponds to website
         reassign_input #sort of aliases function
         @noms_mairies = scrap_mairies_names #scrap mairies names from list page
         @liens_mairies = scrap_mairies_links #Scrap mairies links from list page

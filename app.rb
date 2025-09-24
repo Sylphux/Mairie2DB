@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require 'etc'
 require_relative 'lib/app/scrapper'
 
 def verify
@@ -12,8 +13,9 @@ def verify
         exit
     end
     puts "\nIl existe deux méthodes de recherche :"
-    puts "  Méthode 1 : un lien commençant par https://lannuaire.service-public.fr/"
-    puts "  Méthode 2 : 'mairies votre_recherche'"
+    puts "\n  Méthode 1 : un lien commençant par https://lannuaire.service-public.fr/"
+    puts "  Méthode 2 : 'prefixe_valide votre_recherche'"
+    puts "              - Pour une liste des prefixes, utilisez 'h'"
 end
 
 def perform
