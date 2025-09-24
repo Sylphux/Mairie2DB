@@ -3,6 +3,36 @@ class Scrap
     attr_accessor :instances, :noms_mairies, :liens_mairies, :emails_mairies, :mairies_scrapped, :to_search
     @@instances = []
 
+    def save_as_JSON
+        File.open('db/emails.json', 'w') do |f|
+            f.write(@mairies_scrapped.to_json)
+        end
+        puts "Données enregistrées dans db/emails.json"
+    end
+
+    def save_as_csv
+        
+    end
+
+    def save_as_txt
+        i = 0
+        while @emails_mairies[i] != nil
+            if @emails_mairies[i] != "None"
+                system "echo '#{@noms_mairies[i].to_s} | #{@emails_mairies[i].to_s}' >> db/emails.txt"
+            end
+            i += 1
+        end
+        puts "Données enregistrées dans db/emails.txt"
+    end
+
+    def self.all
+        @@instances
+    end
+
+    def self.one
+        @@instances[0]
+    end
+
     def nokogise(site, element_xpath) # returns raw scrapped elements
         page = Nokogiri::HTML(URI.open(site))
         scrapped = page.xpath(element_xpath)
@@ -100,6 +130,18 @@ class Scrap
         test_input
     end
 
+    def save_prompt
+        puts "\nSave as ? (txt/json/csv/skip)"
+        ask = gets.chomp.to_s
+        if ask == "txt"
+            save_as_txt
+        elsif ask == "json"
+            save_as_JSON
+        elsif ask == "" or ask == "skip"
+            return
+        end
+    end
+
     def go_scrap
         prompt
         reassign_input #sort of aliases function
@@ -112,15 +154,8 @@ class Scrap
         puts "\nVoici les 20 premiers emails pour votre recherche de #{scrap_type_search}s en #{scrap_location_search}\n\n"
         puts @mairies_scrapped
         puts
+        save_prompt
         Scrap.new
-    end
-
-    def self.all
-        @@instances
-    end
-
-    def self.one
-        @@instances[0]
     end
 
     def initialize

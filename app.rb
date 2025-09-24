@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
 require 'etc'
+require 'json'
 require_relative 'lib/app/scrapper'
 
 def verify
